@@ -9,6 +9,7 @@ public class DragItem : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, 
     private Canvas _canvas;
     private CanvasGroup _canvasGroup;
     private Vector2 initialPos;
+    private Transform initialParents;
 
     void Awake()
     {
@@ -16,6 +17,7 @@ public class DragItem : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, 
         _canvas = GetComponentInParent<Canvas>();
         _canvasGroup = GetComponent<CanvasGroup>();
         initialPos = _rectTransform.anchoredPosition;
+        initialParents = transform.parent;
     }
     
     public void OnPointerClick(PointerEventData eventData)
@@ -35,6 +37,7 @@ public class DragItem : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, 
         _canvasGroup.blocksRaycasts = true;
         if (!DropItem.PointerIsOnSlot)
         {
+            ResetSlotsPosition();
             _rectTransform.anchoredPosition = initialPos;
         }
     }
@@ -42,5 +45,11 @@ public class DragItem : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, 
     public void OnDrag(PointerEventData eventData)
     {
         _rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
+    }
+
+    public void ResetSlotsPosition()
+    {
+        transform.SetParent(initialParents);
+        _rectTransform.anchoredPosition = initialPos;
     }
 }

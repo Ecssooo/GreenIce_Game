@@ -1,19 +1,20 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class ObjectMovement : MonoBehaviour
 {
     public float moveSpeed = 100f; // Vitesse de déplacement de l'ennemi
     public float changeDirectionInterval = 3f; // Intervalle de temps pour changer de direction
 
-    private Rigidbody2D rb;
+    public Rigidbody2D rb;
     private Vector2 movementDirection;
     private float nextDirectionChangeTime;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
         StartCoroutine(Wait());
         nextDirectionChangeTime = Time.time + Random.Range(0, changeDirectionInterval);
     }
@@ -39,6 +40,15 @@ public class ObjectMovement : MonoBehaviour
     {
         rb.MovePosition(rb.position + movementDirection * moveSpeed * Time.deltaTime);
     }
+
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "wall")
+        {
+            MoveEnemy();
+        }
+    }
+
 
     IEnumerator Wait()
     {

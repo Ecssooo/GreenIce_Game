@@ -2,19 +2,21 @@ using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Coffre : MonoBehaviour
 {
     [SerializeField] private BoxCollider2D Collider2d;
     private bool isTrigger = false;
-    
+    public GameObject effect;
     public InventoryManager inventory;
-    public PlayerController playerController;
-    
 
+    //private bool objectAvailable = true;
     public SpriteItem spriteItem;
 
-    public GameObject cle;
+    public PlayerController playerController;
+    public Sprite spriteEmpty;
+    public DragItem dragItem;
     void OnTriggerEnter2D(Collider2D truc)
     {
         //Si le joueur est en contact avec le bouton
@@ -32,22 +34,27 @@ public class Coffre : MonoBehaviour
             isTrigger = false;
         }
     }
-
+    
     private void Update()
     {
         Vector2 mousPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
         if (isTrigger)
         {
+            
             if (Collider2d.OverlapPoint(mousPos))
             {
                 if (Input.GetMouseButtonDown(0))
                 {
-                    if (!cle.activeInHierarchy)
-                    {
-                        playerController.enabled = false;
-                        Action();
-                    }
+                    playerController.enabled = false;
+                    if(InventoryManager.objectInHand != null)
+                        if (InventoryManager.objectInHand.GetComponent<Image>().sprite == spriteItem.cle)
+                        {
+                            Action();
+                            effect.SetActive(true);
+                            
+                        }
+                    
                 }
             }
         }
@@ -55,6 +62,7 @@ public class Coffre : MonoBehaviour
         playerController.enabled = true;
     }
 
+    public SoundManager SoundManager;
     private void Action()
     {
         for (int i = 0; i < inventory.slots.Length; i++)
@@ -65,13 +73,18 @@ public class Coffre : MonoBehaviour
                 inventory.isFull[i] = true;
                 inventory.isFull[i+1] = true;
                 inventory.isFull[i+2] = true;
-                inventory.slots_sprite[i].sprite = spriteItem.cle_molette;
+                inventory.slots_sprite[i].sprite = spriteItem.lampe;
                 inventory.slots_sprite[i + 1].sprite = spriteItem.angrais;
                 inventory.slots_sprite[i + 2].sprite = spriteItem.ciseaux;
+                InventoryManager.objectInHand.GetComponent<Image>().sprite = spriteEmpty;
+                InventoryManager.objectInHand.GetComponent<DragItem>().ResetSlotsPosition();
                 Destroy(gameObject);
+                inventory.notifications();
+                SoundManager.ActiveSounds();
                 break;
             }
         }
     }
-    
+
+
 }

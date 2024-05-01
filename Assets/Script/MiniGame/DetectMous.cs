@@ -3,17 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-
+using UnityEngine.SceneManagement;
 public class DetectMous : MonoBehaviour
 {
-    private BoxCollider2D _collider2D;
+    public BoxCollider2D _collider2D;
     public Canvas gameOverScreen;
     public ObjectMovement objectMovement;
-    private void Start()
-    {
-        _collider2D = GetComponent<BoxCollider2D>();
-    }
-
+    public GameObject lumiere;
     void Update()
     {
         Vector2 mousPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -22,7 +18,14 @@ public class DetectMous : MonoBehaviour
         {
             gameOverScreen.gameObject.SetActive(true);
             objectMovement.enabled = false;
+            lumiere.SetActive(false);
+            StartCoroutine(ReloadScene());
         }
     }
-    
+
+    IEnumerator ReloadScene()
+    {
+        yield return new WaitForSeconds(2);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);;
+    }
 }
